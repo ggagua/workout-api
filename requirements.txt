@@ -1,0 +1,5 @@
+Flask==3.0.2
+flask_sqlalchemy==3.1.1
+PyJWT==2.8.0
+PyJWT==2.8.0
+Werkzeug==3.0.1

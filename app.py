@@ -190,6 +190,10 @@ def get_one_exercise(current_user, exercise_id):
 def register():
     data = request.get_json()
 
+
+    if 'name' not in data:
+        return jsonify({'message': 'Username not provided in the request.'}), 400
+
     existing_user = User.query.filter_by(name=data['name']).first()
 
     if existing_user:
@@ -471,16 +475,8 @@ def start_workout_mode(current_user):
 
     return jsonify({'message': 'Workout mode started successfully!', 'workout_session': new_session.serialize()}), 201
 
-@app.route('/workout-mode/current', methods=['GET'])
-@token_required
-def get_current_exercise(current_user):
-    current_session = WorkoutSession.query.filter_by(user_id=current_user.public_id, completed=False).first()
 
-    if current_session:
-        return jsonify({'current_exercise': current_session.serialize()})
-    return jsonify({'message': 'No active workout session found'}), 404
-
-@app.route('/workout-mode/complete', methods=['PUT'])
+@app.route('/workout-mode/start/complete', methods=['POST'])
 @token_required
 def complete_current_exercise(current_user):
     current_session = WorkoutSession.query.filter_by(user_id=current_user.public_id, completed=False).first()

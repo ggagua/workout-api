@@ -7,6 +7,7 @@ import jwt
 from functools import wraps
 import datetime
 import json
+from sqlalchemy import and_
 
 app = Flask(__name__)
 
@@ -56,6 +57,30 @@ class WorkoutPlanFinal(db.Model):
     goal = db.Column(db.String(255))
     session_duration = db.Column(db.Integer)
     selected_exercises = db.Column(db.String(5000))
+
+
+
+class WorkoutSession(db.Model):
+    id = db.Column(db.Integer, primary_key=True, unique=True)
+    user_id = db.Column(db.String(50), nullable=False)
+    workout_plan_id = db.Column(db.Integer, nullable=False)
+    exercise_name = db.Column(db.String(255), nullable=False)
+    sets = db.Column(db.Integer, nullable=True)
+    reps = db.Column(db.Integer, nullable=True)
+    completed = db.Column(db.Boolean, default=False)
+    rest_time = db.Column(db.Integer, nullable=True)
+
+    def serialize(self):
+        return {
+            'id': self.id,
+            'user_id': self.user_id,
+            'workout_plan_id': self.workout_plan_id,
+            'exercise_name': self.exercise_name,
+            'sets': self.sets,
+            'reps': self.reps,
+            'completed': self.completed,
+            'rest_time': self.rest_time
+        }
 
 
 class FitnessGoalsFinal(db.Model):
@@ -164,6 +189,11 @@ def get_one_exercise(current_user, exercise_id):
 @app.route('/register', methods=['POST'])
 def register():
     data = request.get_json()
+
+    existing_user = User.query.filter_by(name=data['name']).first()
+
+    if existing_user:
+        return jsonify({'message': 'Username already exists. Choose a different username.'}), 400
 
     hashed_password = generate_password_hash(data['password'], method='pbkdf2:sha256')
 
@@ -397,6 +427,113 @@ def delete_fitness_goal(current_user, goal_id):
         return jsonify({'message': 'Fitness goal deleted successfully'}), 200
     else:
         return jsonify({'message': 'Fitness goal not found'}), 404
+
+@app.route('/workout-mode/start', methods=['POST'])
+@token_required
+def start_workout_mode(current_user):
+    data = request.get_json()
+
+    workout_plan_id = data.get('workout_plan_id')
+    rest_time = data.get('rest_time')
+
+    if not workout_plan_id or not rest_time:
+        return jsonify({'message': 'Workout plan ID and rest time are required to start the workout mode'}), 400
+
+    workout_plan = WorkoutPlanFinal.query.get(workout_plan_id)
+
+    if not workout_plan:
+        return jsonify({'message': 'Workout plan not found'}), 404
+
+    existing_sessions = WorkoutSession.query.filter_by(user_id=current_user.public_id,
+                                                       workout_plan_id=workout_plan_id,
+                                                       completed=False).all()
+    for existing_session in existing_sessions:
+        existing_session.completed = True
+    db.session.commit()
+
+    exercises_list = json.loads(workout_plan.selected_exercises)
+
+    if not exercises_list:
+        return jsonify({'message': 'No exercises found in the workout plan'}), 400
+
+    first_exercise = exercises_list[0]
+    new_session = WorkoutSession(
+        user_id=current_user.public_id,
+        workout_plan_id=workout_plan_id,
+        exercise_name=first_exercise['name'],
+        sets=first_exercise.get('sets', 0),
+        reps=first_exercise.get('reps', 0),
+        rest_time=rest_time
+    )
+
+    db.session.add(new_session)
+    db.session.commit()
+
+    return jsonify({'message': 'Workout mode started successfully!', 'workout_session': new_session.serialize()}), 201
+
+@app.route('/workout-mode/current', methods=['GET'])
+@token_required
+def get_current_exercise(current_user):
+    current_session = WorkoutSession.query.filter_by(user_id=current_user.public_id, completed=False).first()
+
+    if current_session:
+        return jsonify({'current_exercise': current_session.serialize()})
+    return jsonify({'message': 'No active workout session found'}), 404
+
+@app.route('/workout-mode/complete', methods=['PUT'])
+@token_required
+def complete_current_exercise(current_user):
+    current_session = WorkoutSession.query.filter_by(user_id=current_user.public_id, completed=False).first()
+
+    if current_session:
+        current_session.completed = True
+        db.session.commit()
+
+        workout_plan_id = current_session.workout_plan_id
+        next_exercise = get_next_exercise(current_user, workout_plan_id)
+
+        if next_exercise:
+            return jsonify({'message': 'Exercise completed, moving to the next one', 'next_exercise': next_exercise})
+        else:
+            WorkoutSession.query.filter(
+                and_(
+                    WorkoutSession.user_id == current_user.public_id,
+                    WorkoutSession.workout_plan_id == workout_plan_id
+                )
+            ).delete()
+
+            db.session.commit()
+        return jsonify({'message': 'No next exercise found. You finished your workout!'}), 400
+
+    return jsonify({'message': 'No active workout session found'}), 404
+
+def get_next_exercise(current_user, workout_plan_id):
+    workout_plan = db.session.get(WorkoutPlanFinal, workout_plan_id)
+    current_session = WorkoutSession.query.filter_by(user_id=current_user.public_id, completed=True).first()
+
+    if workout_plan:
+        exercises_list = json.loads(workout_plan.selected_exercises)
+        completed_exercises = {exercise.exercise_name for exercise in
+                               WorkoutSession.query.filter_by(user_id=current_user.public_id,
+                                                              workout_plan_id=workout_plan_id,
+                                                              completed=True).all()}
+
+        for exercise in exercises_list:
+            if exercise['name'] not in completed_exercises:
+                new_session = WorkoutSession(
+                    user_id=current_user.public_id,
+                    workout_plan_id=workout_plan_id,
+                    exercise_name=exercise['name'],
+                    sets=exercise.get('sets', 0),
+                    reps=exercise.get('reps', 0),
+                    rest_time=current_session.rest_time
+                )
+                db.session.add(new_session)
+                db.session.commit()
+                return new_session.serialize()
+
+    return None
+
 
 
 if __name__ == '__main__':

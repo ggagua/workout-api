@@ -190,8 +190,7 @@ Explore the available endpoints, test requests, and understand the functionaliti
 
 
 ## Issues
-
-I strive to make our Star Wars Enthusiast Website as flawless as a lightsaber. If you encounter any issues, bugs, or have suggestions for improvement, I welcome your feedback. Here's how you can help:
+If you encounter any issues, bugs, or have suggestions for improvement, I welcome your feedback. Here's how you can help:
 
 1. **Check Existing Issues**: Before reporting a new issue, please check our [GitHub Issues](https://github.com/ggagua/workout-api/issues) to see if someone else has already reported the same problem or if there's an ongoing discussion about it.
 

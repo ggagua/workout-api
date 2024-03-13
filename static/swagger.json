@@ -1,0 +1,1075 @@
+{
+  "definitions": {
+    "Exercise": {
+      "type": "object",
+      "properties": {
+        "description": {
+          "type": "string",
+          "example": "Upper body strenght exercise"
+        },
+        "difficulty": {
+          "type": "integer",
+          "example": 2
+        },
+        "exercise_id": {
+          "type": "integer",
+          "example":  5
+        },
+        "instructions": {
+          "type": "string",
+          "example": "1. Lie on a flat bench with a barbell above your chest 2. Lower the barbell on your chest 3. Press the barbel back up to the starting position"
+        },
+        "name": {
+          "type": "string",
+          "example": "Bench Press"
+        },
+        "target_muscles": {
+          "type": "string",
+          "example": "Shoulders, Chest, Triceps"
+        }
+      }
+    }
+  },
+  "info": {
+    "description": "This API empowers you to design, track, and manage your personalized workout routines.",
+    "termsOfService": "https://github.com/ggagua/workout-api/blob/main/README.md",
+    "title": "Workout API",
+    "version": "1.0.0"
+  },
+
+  "paths": {
+    "/exercises": {
+      "get": {
+        "description": "<br/>",
+        "responses": {
+          "200": {
+            "description": "List of exercises.",
+            "schema": {
+              "properties": {
+                "exercises": {
+                  "items": {
+                    "$ref": "#/definitions/Exercise"
+                  },
+                  "type": "array"
+                }
+              },
+              "type": "object"
+            }
+          }
+        },
+        "security": [
+          {
+            "APIKeyHeader": []
+          }
+        ],
+        "summary": "Retrieve all exercises."
+      }
+    },
+    "/exercises/{exercise_id}": {
+      "get": {
+        "description": "<br/>",
+        "parameters": [
+          {
+            "description": "ID of the exercise.",
+            "in": "path",
+            "name": "exercise_id",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The requested exercise.",
+            "schema": {
+              "$ref": "#/definitions/Exercise"
+            }
+          },
+          "404": {
+            "description": "Exercise not found.",
+            "schema": {
+              "properties": {
+                "message": {
+                  "example": "Exercise not found",
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            }
+          }
+        },
+        "security": [
+          {
+            "APIKeyHeader": []
+          }
+        ],
+        "summary": "Retrieve a specific exercise by ID."
+      }
+    },
+    "/fitness-goals": {
+      "get": {
+        "description": "<br/>",
+        "parameters": [
+          {
+            "description": "Bearer token for user authentication.",
+            "in": "header",
+            "name": "Authorization",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of fitness goals.",
+            "schema": {
+              "items": {
+                "properties": {
+                  "current_weight": {
+                    "example": 70.5,
+                    "type": "number"
+                  },
+                  "exercise_goals": {
+                    "items": {
+                      "properties": {
+                        "name": {
+                          "example": "Bench Press",
+                          "type": "string"
+                        },
+                        "reps": {
+                          "example": 10,
+                          "type": "integer"
+                        },
+                        "reps_goal": {
+                          "example": 12,
+                          "type": "integer"
+                        },
+                        "weight": {
+                          "example": 50.0,
+                          "type": "number"
+                        },
+                        "weight_goal": {
+                          "example": 60.0,
+                          "type": "number"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "type": "array"
+                  },
+                  "goal_weight": {
+                    "example": 65.0,
+                    "type": "number"
+                  }
+                },
+                "type": "object"
+              },
+              "type": "array"
+            }
+          },
+          "404": {
+            "description": "Fitness goals not found.",
+            "schema": {
+              "properties": {
+                "message": {
+                  "example": "Fitness goals not found",
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "Get all fitness goals for the authenticated user."
+      },
+           "post": {
+        "description": "<br/>",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Authorization",
+            "type": "string",
+            "required": true,
+            "description": "Bearer token for user authentication."
+          },
+          {
+            "in": "body",
+            "name": "Fitness Goal JSON",
+            "required": true,
+            "schema": {
+              "properties": {
+                "current_weight": {
+                  "example": 70.5,
+                  "type": "number"
+                },
+                "goal_weight": {
+                  "example": 65.0,
+                  "type": "number"
+                },
+                "exercises_goals": {
+                  "items": {
+                    "properties": {
+                      "name": {
+                        "example": "Bench Press",
+                        "type": "string"
+                      },
+                      "reps": {
+                        "example": 10,
+                        "type": "integer"
+                      },
+                      "reps_goal": {
+                        "example": 12,
+                        "type": "integer"
+                      },
+                      "weight": {
+                        "example": 50.0,
+                        "type": "number"
+                      },
+                      "weight_goal": {
+                        "example": 60.0,
+                        "type": "number"
+                      }
+                    },
+                    "type": "object"
+                  },
+                  "type": "array"
+                }
+              },
+              "type": "object"
+            },
+            "description": "JSON containing fitness goal information."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Fitness goal created successfully.",
+            "schema": {
+              "properties": {
+                "message": {
+                  "example": "Fitness goal created successfully!",
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            }
+          },
+          "400": {
+            "description": "Missing required goal information or exercise goal information.",
+            "schema": {
+              "properties": {
+                "message": {
+                  "example": "Missing required goal information or exercise goal information",
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "Create a new fitness goal."
+      }
+  },
+    "/fitness-goals/{goal_id}": {
+      "delete": {
+        "description": "<br/>",
+        "parameters": [
+          {
+            "description": "Bearer token for user authentication.",
+            "in": "header",
+            "name": "Authorization",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "description": "ID of the fitness goal to be deleted.",
+            "in": "path",
+            "name": "goal_id",
+            "required": true,
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Fitness goal deleted successfully.",
+            "schema": {
+              "properties": {
+                "message": {
+                  "example": "Fitness goal deleted successfully",
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            }
+          },
+          "404": {
+            "description": "Fitness goal not found.",
+            "schema": {
+              "properties": {
+                "message": {
+                  "example": "Fitness goal not found",
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "Delete a fitness goal for the authenticated user."
+      },
+      "get": {
+        "description": "<br/>",
+        "parameters": [
+          {
+            "description": "Bearer token for user authentication.",
+            "in": "header",
+            "name": "Authorization",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "description": "ID of the fitness goal.",
+            "in": "path",
+            "name": "goal_id",
+            "required": true,
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Details of the requested fitness goal.",
+            "schema": {
+              "properties": {
+                "fitness_goal": {
+                  "properties": {
+                    "current_weight": {
+                      "example": 70.5,
+                      "type": "number"
+                    },
+                    "exercise_goals": {
+                      "items": {
+                        "properties": {
+                          "name": {
+                            "example": "Bench Press",
+                            "type": "string"
+                          },
+                          "reps": {
+                            "example": 10,
+                            "type": "integer"
+                          },
+                          "reps_goal": {
+                            "example": 12,
+                            "type": "integer"
+                          },
+                          "weight": {
+                            "example": 50.0,
+                            "type": "number"
+                          },
+                          "weight_goal": {
+                            "example": 60.0,
+                            "type": "number"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "goal_weight": {
+                      "example": 65.0,
+                      "type": "number"
+                    }
+                  },
+                  "type": "object"
+                }
+              },
+              "type": "object"
+            }
+          },
+          "404": {
+            "description": "Fitness goal not found.",
+            "schema": {
+              "properties": {
+                "message": {
+                  "example": "Fitness goal not found",
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "Get a single fitness goal for the authenticated user."
+      }
+    },
+    "/login": {
+      "get": {
+        "description": "<br/>",
+        "responses": {
+          "200": {
+            "description": "Authentication successful.(Use Basic Auth)",
+            "schema": {
+              "properties": {
+                "token": {
+                  "example": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiMjM0NTY3ODktYmFkZS00YmQwLTllYWEtYjg5Zjg0Y2NmZDEzIiwiZXhwIjoxNjQ1MzA2ODgxfQ.UvoEwVtwACuN6_EOMbF68kZOmGq2GQr5uobVGwWED18",
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            }
+          },
+          "401": {
+            "description": "Authentication failed.",
+            "schema": {
+              "example": "Could not verify",
+              "type": "string"
+            }
+          }
+        },
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ],
+        "summary": "User login endpoint."
+      }
+    },
+    "/logout": {
+      "post": {
+        "description": "<br/>",
+        "responses": {
+          "200": {
+            "description": "Logout successful.",
+            "schema": {
+              "properties": {
+                "message": {
+                  "description": "A success message.",
+                  "example": "Logout successful",
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            }
+          }
+        },
+        "security": [
+          {
+            "APIKeyHeader": []
+          }
+        ],
+        "summary": "Logout the current user immediately."
+      }
+    },
+    "/register": {
+      "post": {
+        "description": "<br/>",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "data",
+            "required": true,
+            "schema": {
+              "properties": {
+                "name": {
+                  "description": "The username for the new user.",
+                  "example": "john_doe",
+                  "type": "string"
+                },
+                "password": {
+                  "description": "The password for the new user.",
+                  "example": "secure_password",
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User registered successfully.",
+            "schema": {
+              "properties": {
+                "message": {
+                  "description": "A success message.",
+                  "example": "New user created!",
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            }
+          },
+          "400": {
+            "description": "Bad request. Username not provided or already exists.",
+            "schema": {
+              "properties": {
+                "message": {
+                  "description": "An error message.",
+                  "example": "Username already exists",
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            }
+          }
+        },
+        "summary": "Register a new user."
+      }
+    },
+"/workout-mode/start": {
+  "post": {
+    "description": "<br/>",
+    "parameters": [
+      {
+        "in": "header",
+        "name": "Authorization",
+        "required": true,
+        "type": "string",
+        "description": "Bearer token for user authentication."
+      },
+      {
+        "in": "body",
+        "name": "workout_start_info",
+        "required": true,
+        "schema": {
+          "properties": {
+            "rest_time": {
+              "type": "integer",
+              "example": 60
+            },
+            "workout_plan_id": {
+              "type": "integer",
+              "example": 1
+            }
+          },
+          "required": ["rest_time", "workout_plan_id"],
+          "type": "object"
+        },
+        "description": "User must provide desired rest times and created workout plans id (from workout-plans)."
+
+      }
+    ],
+    "responses": {
+      "201": {
+        "description": "Workout mode started successfully.",
+        "schema": {
+          "properties": {
+            "message": {
+              "type": "string",
+              "example": "Workout mode started successfully!"
+            },
+            "workout_session": {
+              "type": "object",
+              "properties": {
+                "exercise_name": {
+                  "type": "string",
+                  "example": "Bench Press"
+                },
+                "reps": {
+                  "type": "integer",
+                  "example": 10
+                },
+                "rest_time": {
+                  "type": "integer",
+                  "example": 60
+                },
+                "sets": {
+                  "type": "integer",
+                  "example": 3
+                },
+                "user_id": {
+                  "type": "string",
+                  "example": "abc123"
+                },
+                "workout_plan_id": {
+                  "type": "integer",
+                  "example": 1
+                }
+              }
+            }
+          },
+          "type": "object"
+        }
+      },
+      "400": {
+        "description": "Workout plan ID and rest time are required to start the workout mode.",
+        "schema": {
+          "properties": {
+            "message": {
+              "type": "string",
+              "example": "Workout plan ID and rest time are required to start the workout mode"
+            }
+          },
+          "type": "object"
+        }
+      },
+      "404": {
+        "description": "Workout plan not found.",
+        "schema": {
+          "properties": {
+            "message": {
+              "type": "string",
+              "example": "Workout plan not found"
+            }
+          },
+          "type": "object"
+        }
+      }
+    },
+    "security": [
+      {
+        "Bearer": []
+      }
+    ],
+    "summary": "Start a new workout mode."
+  }    },
+    "/workout-mode/start/complete": {
+      "post": {
+        "description": "<br/>",
+        "parameters": [
+          {
+            "description": "Bearer token for user authentication.",
+            "in": "header",
+            "name": "Authorization",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Exercise completed, moving to the next one.",
+            "schema": {
+              "properties": {
+                "message": {
+                  "example": "Exercise completed, moving to the next one",
+                  "type": "string"
+                },
+                "next_exercise": {
+                  "properties": {
+                    "exercise_name": {
+                      "example": "Deadlift",
+                      "type": "string"
+                    },
+                    "reps": {
+                      "example": 12,
+                      "type": "integer"
+                    },
+                    "rest_time": {
+                      "example": 60,
+                      "type": "integer"
+                    },
+                    "sets": {
+                      "example": 4,
+                      "type": "integer"
+                    },
+                    "user_id": {
+                      "example": "abc123",
+                      "type": "string"
+                    },
+                    "workout_plan_id": {
+                      "example": 1,
+                      "type": "integer"
+                    }
+                  },
+                  "type": "object"
+                }
+              },
+              "type": "object"
+            }
+          },
+          "400": {
+            "description": "No next exercise found. You finished your workout!",
+            "schema": {
+              "properties": {
+                "message": {
+                  "example": "No next exercise found. You finished your workout!",
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            }
+          },
+          "404": {
+            "description": "No active workout session found.",
+            "schema": {
+              "properties": {
+                "message": {
+                  "example": "No active workout session found",
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "Complete the current exercise in the workout mode."
+      }
+    },
+    "/workout-plans": {
+      "get": {
+        "description": "<br/>",
+        "parameters": [
+          {
+            "description": "Bearer token for user authentication.",
+            "in": "header",
+            "name": "Authorization",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of workout plans.",
+            "schema": {
+              "properties": {
+                "workout_plans": {
+                  "items": {
+                    "properties": {
+                      "frequency": {
+                        "example": "3 times a week",
+                        "type": "string"
+                      },
+                      "goal": {
+                        "example": "Build Muscle",
+                        "type": "string"
+                      },
+                      "id": {
+                        "example": 1,
+                        "type": "integer"
+                      },
+                      "name": {
+                        "example": "My Workout Plan",
+                        "type": "string"
+                      },
+                      "selected_exercises": {
+                        "items": {
+                          "properties": {
+                            "distance": {
+                              "example": 0,
+                              "type": "integer"
+                            },
+                            "duration": {
+                              "example": 30,
+                              "type": "integer"
+                            },
+                            "name": {
+                              "example": "Bench Press",
+                              "type": "string"
+                            },
+                            "reps": {
+                              "example": 12,
+                              "type": "integer"
+                            },
+                            "sets": {
+                              "example": 3,
+                              "type": "integer"
+                            }
+                          },
+                          "type": "object"
+                        },
+                        "type": "array"
+                      },
+                      "session_duration": {
+                        "example": 60,
+                        "type": "integer"
+                      }
+                    },
+                    "type": "object"
+                  },
+                  "type": "array"
+                }
+              },
+              "type": "object"
+            }
+          },
+          "404": {
+            "description": "Workout plans not found.",
+            "schema": {
+              "properties": {
+                "message": {
+                  "example": "Workout plans not found",
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "Get all workout plans for the authenticated user."
+      },
+  "post": {
+    "description": "<br/>",
+    "parameters": [
+      {
+        "in": "header",
+        "name": "Authorization",
+        "required": true,
+        "type": "string",
+        "description": "Bearer token for user authentication."
+      },
+      {
+        "in": "body",
+        "name": "Workout Plan",
+        "required": true,
+        "schema": {
+          "properties": {
+            "workout_name": {
+              "type": "string",
+              "example": "My June Plan"
+            },
+            "frequency": {
+              "type": "string",
+              "example": "4x a week"
+            },
+            "goal": {
+              "type": "string",
+              "example": "Gain muscle mass and get more lean"
+            },
+            "session_duration": {
+              "type": "string",
+              "example": "1-1:30 hour"
+            },
+            "selected_exercises": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "example": "bench press"
+                  },
+                  "sets": {
+                    "type": "string",
+                    "example": "5"
+                  },
+                  "reps": {
+                    "type": "string",
+                    "example": "12"
+                  }
+                }
+              }
+            }
+          },
+          "type": "object"
+        },
+        "description": "JSON containing workout plan information, selected_exercises can also include distance and duration. "
+      }
+    ],
+    "responses": {
+      "201": {
+        "description": "Workout plan created successfully.",
+        "schema": {
+          "properties": {
+            "message": {
+              "type": "string",
+              "example": "Workout plan created successfully"
+            }
+          },
+          "type": "object"
+        }
+      },
+      "400": {
+        "description": "Invalid data provided.",
+        "schema": {
+          "properties": {
+            "message": {
+              "type": "string",
+              "example": "Invalid data provided"
+            }
+          },
+          "type": "object"
+        }
+      }
+    },
+    "security": [
+      {
+        "Bearer": []
+      }
+    ],
+    "summary": "Create a new workout plan."
+  }
+},
+    "/workout-plans/{workout_id}": {
+      "get": {
+        "description": "<br/>",
+        "parameters": [
+          {
+            "description": "Bearer token for user authentication.",
+            "in": "header",
+            "name": "Authorization",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "description": "ID of the workout plan.",
+            "in": "path",
+            "name": "workout_id",
+            "required": true,
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Details of the requested workout plan.",
+            "schema": {
+              "properties": {
+                "workout_plan": {
+                  "properties": {
+                    "frequency": {
+                      "example": "3 times a week",
+                      "type": "string"
+                    },
+                    "goal": {
+                      "example": "Build Muscle",
+                      "type": "string"
+                    },
+                    "id": {
+                      "example": 1,
+                      "type": "integer"
+                    },
+                    "name": {
+                      "example": "My Workout Plan",
+                      "type": "string"
+                    },
+                    "selected_exercises": {
+                      "items": {
+                        "properties": {
+                          "distance": {
+                            "example": 0,
+                            "type": "integer"
+                          },
+                          "duration": {
+                            "example": 30,
+                            "type": "integer"
+                          },
+                          "name": {
+                            "example": "Bench Press",
+                            "type": "string"
+                          },
+                          "reps": {
+                            "example": 12,
+                            "type": "integer"
+                          },
+                          "sets": {
+                            "example": 3,
+                            "type": "integer"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "session_duration": {
+                      "example": 60,
+                      "type": "integer"
+                    }
+                  },
+                  "type": "object"
+                }
+              },
+              "type": "object"
+            }
+          },
+          "404": {
+            "description": "Workout plan not found.",
+            "schema": {
+              "properties": {
+                "message": {
+                  "example": "Workout plan not found",
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "Get a single workout plan for the authenticated user."
+      }
+    },
+    "/workout-plans/{workout_plan_id}": {
+      "delete": {
+        "description": "<br/>",
+        "parameters": [
+          {
+            "description": "Bearer token for user authentication.",
+            "in": "header",
+            "name": "Authorization",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "description": "ID of the workout plan to be deleted.",
+            "in": "path",
+            "name": "workout_plan_id",
+            "required": true,
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Workout plan deleted successfully.",
+            "schema": {
+              "properties": {
+                "message": {
+                  "example": "Workout plan deleted successfully",
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            }
+          },
+          "404": {
+            "description": "Workout plan not found.",
+            "schema": {
+              "properties": {
+                "message": {
+                  "example": "Workout plan not found",
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "Delete a workout plan for the authenticated user."
+      }
+    }
+  },
+  "swagger": "2.0"
+}

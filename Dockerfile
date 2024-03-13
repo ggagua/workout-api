@@ -10,6 +10,7 @@ RUN apk add gcc musl-dev libffi-dev
 RUN pip install -r requirements.txt
 
 COPY ./app.py /app
+COPY ./static/swagger.json /app/static/swagger.json
 
 CMD ["flask", "run", "--host", "0.0.0.0"]
 

@@ -8,12 +8,36 @@ from functools import wraps
 import datetime
 import json
 from sqlalchemy import and_
+from flask_swagger_ui import get_swaggerui_blueprint
+
 
 app = Flask(__name__)
-
 app.config['SECRET_KEY'] = 'secretkeyvery'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///exercises.db'
 db = SQLAlchemy(app)
+
+SWAGGER_URL = '/api/docs'
+API_URL = '/static/swagger.json'
+
+
+swaggerui_blueprint = get_swaggerui_blueprint(
+    SWAGGER_URL,
+    API_URL,
+    config={
+        'app_name': "Workout RESTful API"
+    },
+    # oauth_config={  # OAuth config. See https://github.com/swagger-api/swagger-ui#oauth2-configuration .
+    #    'clientId': "your-client-id",
+    #    'clientSecret': "your-client-secret-if-required",
+    #    'realm': "your-realms",
+    #    'appName': "your-app-name",
+    #    'scopeSeparator': " ",
+    #    'additionalQueryStringParams': {'test': "hello"}
+    # }
+)
+
+app.register_blueprint(swaggerui_blueprint)
+
 
 
 class User(db.Model):
@@ -121,6 +145,7 @@ class ExerciseGoal(db.Model):
 
 with app.app_context():
     db.create_all()
+
 
 
 def token_required(f):
@@ -529,7 +554,6 @@ def get_next_exercise(current_user, workout_plan_id):
                 return new_session.serialize()
 
     return None
-
 
 
 if __name__ == '__main__':

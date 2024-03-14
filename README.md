@@ -186,7 +186,7 @@ Once you have fulfilled the prerequisites, you can access the Swagger Documentat
 
 [Swagger UI - Workout Planner API](http://localhost:8000/api/docs)
 
-Explore the available endpoints, test requests, and understand the functionalities provided by the Workout Planner API.
+**For testing endpoints I highly suggest to use Postman** !
 
 
 ## Issues

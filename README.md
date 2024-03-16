@@ -32,7 +32,7 @@ Make sure you have the following installed:
 
    ```bash
    git clone https://github.com/ggagua/workout-api.git
-   cd Workout-Planner-API
+   cd workout-api
 
 2. **Build the docker image:**
 

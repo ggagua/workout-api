@@ -31,7 +31,7 @@ Make sure you have the following installed:
 1. **Clone the repository:**
 
    ```bash
-   git clone https://github.com/your-username/Workout-Planner-API.git
+   git clone https://github.com/ggagua/workout-api.git
    cd Workout-Planner-API
 
 2. **Build the docker image:**
@@ -49,7 +49,7 @@ The API will be accessible at http://localhost:5000.
 
 4. Install required modules (Flask, SQLAlchemy, etc.), pip install -r requirements.txt
 5. Run app.py
-6. In your web-browser access your localhost (127.0.0.1:8000).
+6. In your web-browser access your localhost (http://localhost:8000).
 7. If your localhost is taken by another project or service, you can modify last line of the project and add
    port = 9000. Ex : app.run(debug=True, port = 9000)
 
